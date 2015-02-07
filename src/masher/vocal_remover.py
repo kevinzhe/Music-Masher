@@ -4,7 +4,6 @@
 import echonest.remix.audio as audio
 import echonest.remix.modify as modify
 import numpy as np
-import copy
 
 
 def remove_vocals(song):
@@ -13,23 +12,21 @@ def remove_vocals(song):
         print 'Got %s, expected AudioData' % type(song)
         raise TypeError
     # new array of same size
-    bg_only = copy.deepcopy(song)
-    # out_shape = (len(song.data),)
-    # bg_only = audio.AudioData(shape=out_shape, numChannels=1, sampleRate=44100)
+    out_shape = (len(song.data),)
+    bg_only = audio.AudioData(shape=out_shape, numChannels=1, sampleRate=44100)
     # iterate though old song
-    for sample in bg_only.data:
-        new = sample[0] / 2 - sample[1] / 2
-        sample[0] = new
-        sample[1] = new
-
+    idx_0 = None
+    count = 0
+    assign = 0
+    print len(song.data)
+    for x in np.nditer(song.data):
+        if count % 2 == 1:
+            new = np.subtract(np.divide(idx_0, 2), np.divide(x, 2))
+            bg_only.data[assign] = new
+            assign += 1
+        else:
+            idx_0 = x
+        count += 1
+        if count % 100000 == 0:
+            print count
     return bg_only
-
-    # # there should be a numpy iterator here
-    # for x in np.nditer(data.song, flags=['external_loop'], order='F'):
-    #     bg_only.data
-
-
-if __name__ == '__main__':
-    song = audio.LocalAudioFile('/home/kevin/Dropbox/TartanHacks2015/red.mp3')
-    removed = remove_vocals(song)
-    removed.encode('/home/kevin/Dropbox/TartanHacks2015/red-test-remove.mp3')
