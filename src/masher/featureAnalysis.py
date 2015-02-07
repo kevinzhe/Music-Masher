@@ -11,22 +11,22 @@ from changeToCorrectTempo import changeToCorrectTempo
 #loudness metric
 def loudnessMetric(song1):
 	# song1 = audio.LocalAudioFile(file1)
-	chunks1 = song1.analysis.beats
+	chunks1 = song1.analysis.segments
 	gradient = []
 	for i in xrange(len(chunks1)-1):
 		dif = chunks1[i+1].mean_loudness() - chunks1[i].mean_loudness()
 		time = chunks1[i].duration
 		gradient += [dif/time]
-	assert(len(gradient) == len(chunks1)-1)
+	#assert(len(gradient) == len(chunks1)-1)
 	return gradient
 
 def getTime(filename):
 	song = audio.LocalAudioFile(filename)
-	chunks = song.analysis.beats
+	chunks = song.analysis.segments
 	time = [(chunks[index].start + chunks[index].duration/2) for index in xrange(len(chunks))]
 	return time
 
-def loudnessCMP(file1,file2,width=10,threshold=5):
+def loudnessCMP(file1,file2,width=5,threshold=10):
 	gradient1 = loudnessMetric(file1)
 	gradient2 = loudnessMetric(file2)
 	#want them to align when they are 0
@@ -48,8 +48,8 @@ def loudnessCMP(file1,file2,width=10,threshold=5):
 	# print gradPoints1
 	# print gradPoints2
 	pairs = []
-	time1 = getTime(file1)
-	time2 = getTime(file2)
+	# time1 = getTime(file1)
+	# time2 = getTime(file2)
 	for i in xrange(len(gradPoints1)):
 		for j in xrange(len(gradPoints2)):
 			if gradPoints1[i][1] == gradPoints2[j][1]:
@@ -57,7 +57,7 @@ def loudnessCMP(file1,file2,width=10,threshold=5):
 				pairs += [(i,j)]
 	return set(pairs)
 
-def almostEqual(a,b,d=30):
+def almostEqual(a,b,d=40):
 	if abs(a-b) <= d: return True
 	else: return False
 
@@ -71,11 +71,11 @@ def CMP(t1,t2):
 def pitchCmp(song1,song2,compare=CMP):
 	# song1 = audio.LocalAudioFile(file1)
 	# song2 = audio.LocalAudioFile(file2)
-	chunks1 = song1.analysis.beats
-	chunks2 = song2.analysis.beats
+	chunks1 = song1.analysis.segments
+	chunks2 = song2.analysis.segments
 	closeVals = []
-	for i in xrange(len(chunks1)):
-		for j in xrange(len(chunks2)):
+	for i in xrange(len(chunks1),0,4):
+		for j in xrange(len(chunks2),0,4):
 			vec1 = np.array(chunks1[i].mean_pitches())
 			vec1 /= (np.dot(vec1,vec1)**0.5)
 			vec2 = np.array(chunks2[j].mean_pitches())
@@ -90,11 +90,13 @@ def pitchCmp(song1,song2,compare=CMP):
 def timbreCMP(song1,song2,compare=CMP):
 	# song1 = audio.LocalAudioFile(file1)
 	# song2 = audio.LocalAudioFile(file2)
-	chunks1 = song1.analysis.beats
-	chunks2 = song2.analysis.beats
+	chunks1 = song1.analysis.segments
+	print "chunks1 = ", len(chunks1)
+	chunks2 = song2.analysis.segments
+	print "chunks2 = ", len(chunks2)
 	closeVals = []
-	for i in xrange(len(chunks1)):
-		for j in xrange(len(chunks2)):
+	for i in xrange(len(chunks1),0,4):
+		for j in xrange(len(chunks2),0,4):
 			vec1 = np.array(chunks1[i].mean_timbre())
 			vec1 /= (np.dot(vec1,vec1)**0.5)
 			vec2 = np.array(chunks2[j].mean_timbre())
@@ -102,7 +104,7 @@ def timbreCMP(song1,song2,compare=CMP):
 			result = np.dot(vec1,vec2)
 			# closeVals += [(chunks1[i].start,chunks2[j].start,result)]
 			closeVals += [(i,j,result)]
-	closeVals = sorted(closeVals,compare)[:1000]
+	closeVals = sorted(closeVals,compare)#[:1000]
 	closeVals = [(a[0],a[1]) for a in closeVals]
 	return set(closeVals)
 
@@ -119,9 +121,13 @@ def main(song1,song2):
 	# song1 = audio.LocalAudioFile(f1)
 	# song2 = audio.LocalAudioFile(f2)
 	l = loudnessCMP(song1,song2)
+	# print l
 	p = pitchCmp(song1,song2)
+	# print p
 	t = timbreCMP(song1,song2)
-	matchup = intersection(intersection(l,p),t)
+	print t
+	matchup = intersection(t,p)
+	# matchup = intersection(intersection(l,p),t)
 	return sorted(list(matchup))
 
 # main("dhorse1.wav","clock1.wav")
