@@ -1,5 +1,6 @@
 import echonest.remix.audio as audio
 import featureAnalysis
+import time
 
 def getClosestBar(filename):
 	song0 = audio.LocalAudioFile("dhorse1.wav")
@@ -40,7 +41,13 @@ def getSequence(f1,f2):
 	sorted1 = sorted(sections1)[::-1]
 	sorted2 = sorted(sections2)
 	result = []
+	print len(sections1)
+	counter = 0
 	for s in sections1:
+		counter += 1
+		if counter == 9:
+			counter = 0
+			time.sleep(0.5)
 		s.encode("subsection.wav")
 		t = audio.LocalAudioFile("subsection.wav")
 		beats = t.analysis.beats
