@@ -40,10 +40,13 @@ def getSequence(f1,f2):
 	# A2 = [featureAnalysis.loudnessMetric(s) for s in sections2]
 	sorted1 = sorted(sections1)[::-1]
 	sorted2 = sorted(sections2)
+	newList = []
+	for i in xrange(len(sorted1)+len(sorted2)-1):
+		newList += sorted1[i/2] if i%2 == 0 else sorted2[i/2]
 	result = []
-	print len(sections1)
+	# print len(sections1)
 	counter = 0
-	for s in sections1:
+	for s in newList:
 		counter += 1
 		if counter == 9:
 			counter = 0
