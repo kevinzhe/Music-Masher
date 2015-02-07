@@ -6,7 +6,7 @@ import sys
 import dirac
 from echonest.remix import audio
 
-file1 = audio.LocalAudioFile("partyusa.mp3")
+#file1 = audio.LocalAudioFile("partyusa.mp3")
 
 def changeToCorrectTempo(audioFile, targetTempo):
     #takes in an audioFile, targetTempo, returns audioFile @ correct tempo
@@ -38,4 +38,4 @@ def changeToCorrectTempo(audioFile, targetTempo):
     output = audio.assemble(collect, numChannels=2)
     return output
 
-changeToCorrectTempo(file1,120.055).encode("TestOutput.mp3")
+#changeToCorrectTempo(file1,120.055).encode("TestOutput.mp3")
