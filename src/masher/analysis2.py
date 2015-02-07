@@ -40,12 +40,21 @@ def getSequence(f1,f2):
 	sorted1 = sorted(sections1)[::-1]
 	sorted2 = sorted(sections2)
 	result = []
-	for i in xrange(len(sorted1)+len(sorted2)-1):
-		if i%2 == 0:
-			result += [sorted1[i/2]]
-		else:
-			result += [sorted2[i/2]]
+	for s in sections1:
+		s.encode("subsection.wav")
+		t = audio.LocalAudioFile("subsection.wav")
+		beats = t.analysis.beats
+		result += [(t,beats)]
 	return result
+
+
+	# for i in xrange(len(sorted1)+len(sorted2)-1):
+
+	# 	if i%2 == 0:
+	# 		result += [sorted1[i/2]]
+	# 	else:
+	# 		result += [sorted2[i/2]]
+	# return result
 
 print getSequence("dhorse1.wav","clock1.wav")
 
